@@ -1,4 +1,0 @@
-/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build/intermediates/classes/debug
-/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build/intermediates/pre-dexed/debug/classes-04a15fd041684e2f56a7563288de9340f9c68b17.jar
-/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build/intermediates/pre-dexed/debug/android-support-v7-appcompat-6e6b5d1d49aa1531b364060d7b2ef4af5e592e16.jar
-/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build/intermediates/pre-dexed/debug/android-support-v4-83dd97a0f25bfb264a6b9b1a0d4e952473a0d1bd.jar
