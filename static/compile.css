@@ -1,0 +1,11 @@
+.compile-message {
+    font-family: "Courier New", Courier, monospace, "Lucida Console", Monaco;
+    margin: 3px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.compile-error {
+    font-family: "Courier New", Courier, monospace, "Lucida Console", Monaco;
+    color: red;
+}

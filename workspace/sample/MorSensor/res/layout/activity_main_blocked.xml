@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5sp"
+    android:orientation="vertical"
+    tools:context="com.example.ec2bulb.MainActivity" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10sp"
+        android:textSize="20sp"
+        android:text="Device Connected" />
+    
+    <TextView
+        android:id="@+id/tv_ec_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tv_device_name_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:text="" />
+    
+    <TextView
+        android:id="@+id/tv_device_addr_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:text="" />
+    
+    <Button
+        android:id="@+id/btn_stop_service"
+        style="@style/thin_small_button"
+        android:text="Disconnect" />
+    
+    <Button
+        android:id="@+id/btn_rebuild_service"
+        style="@style/thin_small_button"
+        android:text="Reconnect" />
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+        android:orientation="horizontal">
+	    <EditText
+	        android:id="@+id/et_send"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+            android:layout_weight="1" />
+	    
+	    <Button
+	        android:id="@+id/btn_send"
+	        style="@style/thin_small_button"
+	        android:text="Send" />
+        
+    </LinearLayout>
+
+</LinearLayout>

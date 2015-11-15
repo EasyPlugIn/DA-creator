@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <title>EasyConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-theme.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui.min.css')}}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fading.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='object.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='wa_set_model.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='wa_set_mapping_function.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='wa_set_parameter.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='idf_module.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='odf_module.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='join_module.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_function.css')}}">
+    <script src="{{ url_for('static', filename='select_device_model.js') }}"></script>
+
+    <link href="{{ url_for('static', filename='da-creater.css') }}" rel="stylesheet" type="text/css" media="all">
+    <link href="{{ url_for('static', filename='compile.css') }}" rel="stylesheet" type="text/css" media="all">
+    <script src="{{ url_for('static', filename='jquery-1.11.2.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='da-creater.js')}}"></script>
+
+  </head>
+  <body>
+    <div id="wrapper">
+
+      <div id="header">
+        <nav id="nav" class="navigation lcyan" style="position: relative; left: auto;">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-12">
+                <ul class="menu fading l_tinynav1">
+                  <li id="menu-title"><label>EasyConnect</label></li>
+                  <li><a href="#"><i class="icon-home"></i>DF Creation</a>
+                    <ul>
+                      <li class="model-list"><a>G-sensor</a></li>
+                      <li class="model-list"><a>Gyroscope</a></li>
+                      <li class="model-list"><a>Volume</a></li>
+                      <li class="model-list"><a>M-sensor</a></li>
+                    </ul>
+                  </li>
+
+                  <li><a href="#"><i class="icon-file"></i>DM Creation</a>
+                    <ul>
+                      <li class="model-list"><a>Bulb Model 1</a></li>
+                      <li class="model-list"><a>Tail</a></li>
+                      <li class="model-list"><a>Google Glass</a></li>
+                      <li class="model-list"><a>GARMIN Ring</a></li>
+                    </ul>
+                  </li>
+
+                  <li><a href="#"><i class="icon-file"></i>DA Creation</a>
+                    <ul>
+                      {% for dm in device_model_name_list %}
+                        <li class="model-list"><a href="/da-creater/{{dm}}">{{ dm }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+
+                  <li id="menu-non-button" style="width:10%"><a></a></li>
+                  <li><a>Yb-Lin</a></li>
+                  <li ><img style="height:100%" src="{{ url_for('static', filename='W4ssnp8.jpg') }}"/></li>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div id="content">
+        {% block content %}{% endblock %}
+        {# <iframe id="da-creater" src="/da-creater/Dandelion"/> #}
+      </div>
+
+    </div>
+  </body>
+</html>

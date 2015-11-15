@@ -1,0 +1,39 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h3>Thread Pool</h3>
+    <ul>
+    {% for i in thread_pool %}
+      <li><a href="/compile/{{i}}">{{ i }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h3>Finish Pool</h3>
+    <ul>
+    {% for i in finish_pool %}
+      <li><a href="/compile/{{i}}">{{ i }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h3>APK list</h3>
+    <ul>
+    {% for i in apk_list %}
+      <li><a href="/download/{{ i }}">{{ i }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <a href="/clean-downloads">Clean all</a>
+
+    <hr>
+
+    <a href="/">index</a>
+    <script>
+      setTimeout(function () {window.location = window.location;}, 1000);
+    </script>
+  </body>
+</html>

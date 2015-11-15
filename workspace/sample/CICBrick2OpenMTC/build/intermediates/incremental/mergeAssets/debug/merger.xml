@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="unspecified"><source path="/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build/intermediates/exploded-aar/sample/appcompat_v7/unspecified/assets"/></dataSet><dataSet config="main"><source path="/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/assets"/></dataSet><dataSet config="debug"><source path="/root/flask-easyconnect/workspace/sample/CICBrick2OpenMTC/build-types/debug/assets"/></dataSet></merger>
