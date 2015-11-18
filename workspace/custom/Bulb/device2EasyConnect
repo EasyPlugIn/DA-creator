@@ -1,0 +1,2 @@
+byte[] data = bq.first(2);
+bq.consume(2);

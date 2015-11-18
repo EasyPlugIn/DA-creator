@@ -1,0 +1,87 @@
+{% extends "easyconnect-template.html" %}
+{% block content %}
+<form action="/da-creator/{{ device_model_name }}" method="POST">
+  <span>Device Model: </span>
+    <span>{{ device_model_name }}</span>
+    <input type="hidden" name="device-model-name" value="{{ device_model_name }}"><br>
+  <span>Feature List: </span>
+  <ul>
+    {% for f in features %}
+      <li>{{ f }}</li>
+      <input type="hidden" name="feature[]" value="{{ f }}">
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <h1>Initialzation</h1>
+  <div>
+    <div class="editor">
+      <span class="code">static public void deviceInitialize () {</span><br>
+      <textarea id="device-initialize" class="code code-area" name="device-initialize">{{ code_device_initialize }}</textarea><br>
+      <span class="code">}</span><br>
+    </div>
+    <div class="toolkit">
+      <button type="button" onclick="insertTextAtCaret('device-initialize', 'send_dataln();');">send_dataln();</button>
+      <button type="button" onclick="insertTextAtCaret('device-initialize', 'try {\n} catch () {\n}')">try-catch</button>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <h1>JSON Encoder (Up-stream)</h1>
+  <div>
+    <div class="editor">
+      <span class="code">static public void device2EasyConnect (ByteQueue bq) {</span><br>
+      <span class="code note">/* push data with <span class="builtin">EasyConnect.push_data( feature_name , data )</span> */</span><br>
+      <textarea id="device2easyconnect" class="code code-area" name="device2easyconnect">{{ code_device2easyconnect }}</textarea><br>
+      <span class="code">}</span><br>
+    </div>
+    <div class="toolkit">
+      {% for f in features %}
+        <button type="button" onclick="insertTextAtCaret('upstream', 'EasyConnect.push_data(&quot;{{ f }}&quot;, );');">EasyConnect.push_data("{{ f }}", );</button>
+      {% endfor %}
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <h1>JSON Decoder (Down-stream)</h1>
+  <div>
+    <div class="editor">
+      <span class="code">static public void easyConnect2Device (String feature, JSONArray data) {</span><br>
+      <span class="code note">/* pull data with <span class="builtin">EasyConnect.pull_data( feature_name )</span> */</span><br>
+      <textarea id="easyconnect2device" class="code code-area" name="easyconnect2device">{{ code_easyconnect2device }}</textarea><br>
+      <span class="code">}</span><br>
+    </div>
+    <div class="toolkit">
+      {% for f in features %}
+        <button type="button" onclick="insertTextAtCaret('downstream', 'EasyConnect.pull_data(&quot;{{ f }}&quot;);');">EasyConnect.pull_data("{{ f }}");</button>
+      {% endfor %}
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <h1>Termination</h1>
+  <div>
+    <div class="editor">
+      <span class="code">static public void deviceTerminate () {</span><br>
+      <textarea id="device-terminate" class="code code-area" name="device-terminate">{{ code_device_terminate }}</textarea><br>
+      <span class="code">}</span><br>
+    </div>
+    <div class="toolkit">
+      <button type="button" onclick="insertTextAtCaret('device-terminate', 'send_dataln();');">send_dataln();</button>
+      <button type="button" onclick="insertTextAtCaret('device-terminate', 'try {\n} catch () {\n}')">try-catch</button>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <br>
+  <input type="submit" value="Compile">
+  <hr>
+
+  <div id="footer">
+    <span>Thanks for using EasyConnect DA creator, have a nice day!</span><br>
+    <span>If you have problem using our system, please contact: <a href="mailto:{{ email }}">{{ email }}</a></span>
+  </div>
+
+</form>
+{% endblock %}

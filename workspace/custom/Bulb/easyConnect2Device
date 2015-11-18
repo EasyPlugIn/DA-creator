@@ -1,0 +1,11 @@
+try {
+    int luminance = data.getInt(0);
+    byte[] chars;
+    if (luminance > 0) {
+        chars = new byte[ luminance * 2 ];
+        Arrays.fill(chars, (byte)48);
+        send_data(chars);
+    }
+} catch (JSONException e) {
+    e.printStackTrace();
+}
