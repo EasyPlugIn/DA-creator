@@ -1,9 +1,9 @@
 {% extends "easyconnect-template.html" %}
 {% block content %}
-<form action="/da-creator/{{ device_model_name }}" method="POST">
+<form action="/da-creator/{{ dm_name }}" method="POST">
   <span>Device Model: </span>
-    <span>{{ device_model_name }}</span>
-    <input type="hidden" name="device-model-name" value="{{ device_model_name }}"><br>
+    <span>{{ dm_name }}</span>
+    <input type="hidden" name="device-model-name" value="{{ dm_name }}"><br>
   <span>Feature List: </span>
   <ul>
     {% for f in features %}
