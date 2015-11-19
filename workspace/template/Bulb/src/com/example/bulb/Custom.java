@@ -13,29 +13,19 @@ public class Custom {
     static final public String[] df_list = new String[]{"Luminance"};
 
     static public void deviceInitialize () {
+{{ code_deviceInitialize }}
     }
 
     static public void device2EasyConnect (ByteQueue bq) {
-        byte[] data = bq.first(2);
-        logging("Get data: ["+ new String(data) +"]");
-        bq.consume(2);
+{{ code_device2easyconnect }}
     }
 
     static public void easyConnect2Device (String feature, JSONArray data) {
-        try {
-            int luminance = data.getInt(0);
-            byte[] chars;
-            if (luminance > 0) {
-                chars = new byte[ luminance * 2 ];
-                Arrays.fill(chars, (byte)48);
-                send_data(chars);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+{{ code_easyconnect2Device }}
     }
 
     static public void deviceTerminate () {
+{{ code_deviceTerminate }}
     }
 
     /******************************************************************************/

@@ -6,13 +6,19 @@
     <input type="hidden" name="device-model-name" value="{{ dm_name }}"><br>
   <span>Feature List: </span>
   <ul>
-    {% for f in features %}
-      <li>{{ f }}</li>
-      <input type="hidden" name="feature[]" value="{{ f }}">
-    {% endfor %}
+  {% for f in features %}
+    <li>{{ f }}</li>
+    <input type="hidden" name="feature[]" value="{{ f }}">
+  {% endfor %}
   </ul>
 
   <hr>
+
+  {% if da_available %}
+  <span>The Android DA for this model is available, </span>
+  <a href="/download/{{ dm_name }}.apk">Download</a>
+  <hr>
+  {% endif %}
 
   <h1>Initialzation</h1>
   <div>
@@ -37,9 +43,9 @@
       <span class="code">}</span><br>
     </div>
     <div class="toolkit">
-      {% for f in features %}
-        <button type="button" onclick="insertTextAtCaret('upstream', 'EasyConnect.push_data(&quot;{{ f }}&quot;, );');">EasyConnect.push_data("{{ f }}", );</button>
-      {% endfor %}
+  {% for f in features %}
+      <button type="button" onclick="insertTextAtCaret('upstream', 'EasyConnect.push_data(&quot;{{ f }}&quot;, );');">EasyConnect.push_data("{{ f }}", );</button>
+  {% endfor %}
     </div>
     <div class="clear"></div>
   </div>
@@ -53,9 +59,9 @@
       <span class="code">}</span><br>
     </div>
     <div class="toolkit">
-      {% for f in features %}
-        <button type="button" onclick="insertTextAtCaret('downstream', 'EasyConnect.pull_data(&quot;{{ f }}&quot;);');">EasyConnect.pull_data("{{ f }}");</button>
-      {% endfor %}
+  {% for f in features %}
+      <button type="button" onclick="insertTextAtCaret('downstream', 'EasyConnect.pull_data(&quot;{{ f }}&quot;);');">EasyConnect.pull_data("{{ f }}");</button>
+  {% endfor %}
     </div>
     <div class="clear"></div>
   </div>
