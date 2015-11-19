@@ -18,8 +18,9 @@ import os
 
 DOWNLOAD_PATH = 'downloads'
 WORKSPACE_PATH = 'workspace'
-PROJECT_TEMPLATE_PATH = os.path.join(WORKSPACE_PATH, 'template')
-CUSTOM_CODE_PATH = os.path.join(WORKSPACE_PATH, 'custom')
+CUSTOM_CODE_PATH = 'custom'
+CUSTOM_TEMPLATE_PATH = 'Bulb/src/com/example/bulb'
+DA_TEMPLATE_PATH = os.path.join(WORKSPACE_PATH, 'template')
 BACKUP_POSTFIX = 'backup'
 OUTPUT_APK_PATH = 'Bulb/build/outputs/apk'
 OUTPUT_APK_POSTFIX = '-release-unsigned.apk'
@@ -97,7 +98,7 @@ def da_creator(dm_name):
     return render_template(template, **context)
 
 
-def get_dm_name_list():
+def get_dm_name_list(): # {{{
     import urllib
     import json
     raw_data = json.loads(str(
@@ -107,9 +108,10 @@ def get_dm_name_list():
             ).readall(), 'utf8'
         ))
     return raw_data
+#}}}
 
 
-def get_df_list(dm_name):
+def get_df_list(dm_name):   #{{{
     raw_data = json.loads(str(
             urllib.request.urlopen(
                 'http://openmtc.darkgerm.com:7788/get_model_info_for_da',
@@ -117,6 +119,7 @@ def get_df_list(dm_name):
             ).readall(), 'utf8'
         ))
     return [i[0] for i in raw_data['idf'] + raw_data['odf']]
+#}}}
 
 
 def da_creator_form(dm_name):
@@ -199,10 +202,10 @@ def recover_custom_code(dm_name):
 
 def setup_project(dm_name):
     shutil.rmtree(join(WORKSPACE_PATH, dm_name), ignore_errors=True)
-    shutil.copytree(PROJECT_TEMPLATE_PATH, join(WORKSPACE_PATH, dm_name))
+    shutil.copytree(DA_TEMPLATE_PATH, join(WORKSPACE_PATH, dm_name))
 
-    print(join(WORKSPACE_PATH, dm_name, 'Bulb/src/com/example/bulb'))
-    loader = FileSystemLoader(join(WORKSPACE_PATH, dm_name, 'Bulb/src/com/example/bulb'))
+    print(join(WORKSPACE_PATH, dm_name, CUSTOM_TEMPLATE_PATH))
+    loader = FileSystemLoader(join(WORKSPACE_PATH, dm_name,CUSTOM_TEMPLATE_PATH))
     env = Environment(loader=loader)
 
     # get and render template file
@@ -215,7 +218,7 @@ def setup_project(dm_name):
         'code_deviceTerminate': open(join(model_custom_code_path, 'deviceTerminate')).read(),
     }
 
-    with open(join(WORKSPACE_PATH, dm_name, 'Bulb/src/com/example/bulb', 'Custom.java'), 'w') as f:
+    with open(join(WORKSPACE_PATH, dm_name, CUSTOM_TEMPLATE_PATH, 'Custom.java'), 'w') as f:
         f.write(template.render(**context))
 
 
@@ -255,12 +258,6 @@ def monitor():
 def download(filename):
     return send_from_directory(DOWNLOAD_PATH, filename, as_attachment=True)
 
-
-@app.route('/clean-downloads')
-def clean_downloads():
-    for i in os.listdir('downloads'):
-        os.remove('downloads/{}'.format(i))
-    return redirect('/monitor')
 
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=8000, debug=False)
