@@ -23,7 +23,8 @@ CUSTOM_TEMPLATE_PATH = 'Bulb/src/com/example/bulb'
 DA_TEMPLATE_PATH = os.path.join(WORKSPACE_PATH, 'template')
 BACKUP_POSTFIX = 'backup'
 OUTPUT_APK_PATH = 'Bulb/build/outputs/apk'
-OUTPUT_APK_POSTFIX = '-release-unsigned.apk'
+# OUTPUT_APK_POSTFIX = '-release-unsigned.apk'
+OUTPUT_APK_POSTFIX = '-debug.apk'
 
 app = Flask(__name__)
 lock = threading.Semaphore()
