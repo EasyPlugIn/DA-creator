@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Bulb</name>
+	<name>{{ dm_name }}</name>
 	<comment></comment>
 	<projects>
 	</projects>

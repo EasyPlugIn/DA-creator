@@ -1,4 +1,4 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
 import java.util.Arrays;
 
@@ -9,19 +9,19 @@ import android.util.Log;
 
 public class Custom {
 
-    static final public String DEVICE_MODEL = "Bulb";
-    static final public String[] df_list = new String[]{"Luminance"};
+    static final public String DEVICE_MODEL = "{{ dm_name }}";
+    static final public String[] df_list = new String[]{"{{ df_list }}"};
 
     static public void deviceInitialize () {
 {{ code_deviceInitialize }}
     }
 
     static public void device2EasyConnect (ByteQueue bq) {
-{{ code_device2easyconnect }}
+{{ code_device2EasyConnect }}
     }
 
     static public void easyConnect2Device (String feature, JSONArray data) {
-{{ code_easyconnect2Device }}
+{{ code_easyConnect2Device }}
     }
 
     static public void deviceTerminate () {

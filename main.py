@@ -7,24 +7,210 @@ from jinja2 import Environment, FileSystemLoader
 import subprocess as sub
 import threading
 import time
-import traceback
-from string import Template
 import os
 import shutil
 import urllib
 import json
-import os
 
 
 DOWNLOAD_PATH = 'downloads'
-WORKSPACE_PATH = 'workspace'
-CUSTOM_CODE_PATH = 'custom'
-CUSTOM_TEMPLATE_PATH = 'Bulb/src/com/example/bulb'
-DA_TEMPLATE_PATH = os.path.join(WORKSPACE_PATH, 'template')
-BACKUP_POSTFIX = 'backup'
-OUTPUT_APK_PATH = 'Bulb/build/outputs/apk'
-# OUTPUT_APK_POSTFIX = '-release-unsigned.apk'
-OUTPUT_APK_POSTFIX = '-debug.apk'
+
+class DAProject:
+    DA_TEMPLATE_ROOT_PATH = 'da-template'
+    WORKSPACE_PATH = 'workspace'
+    CUSTOM_CODE_PATH = 'custom'
+    BACKUP_POSTFIX = 'backup'
+
+    def __init__(self, dm_name):
+        self.dm_name = dm_name.replace('-', '_')
+
+    def create(self):
+        self.clean()
+        shutil.copytree(DAProject.DA_TEMPLATE_ROOT_PATH, self.root_path)
+        shutil.move(
+            os.path.join(self.root_path, 'MODEL'),
+            os.path.join(self.root_path, self.dm_name)
+        )
+        shutil.move(
+            os.path.join(self.root_path, self.dm_name, 'src/com/example/model'),
+            os.path.join(self.root_path, self.dm_name, 'src/com/example/', self.dm_name.lower()),
+        )
+
+    def clean(self):
+        shutil.rmtree(self.root_path, ignore_errors=True)
+
+    @property
+    def root_path(self):
+        return os.path.join(DAProject.WORKSPACE_PATH, self.dm_name)
+
+    @property
+    def src_code_path(self):
+        return os.path.join(
+            self.root_path,
+            self.dm_name,
+            'src/com/example',
+            self.dm_name.lower()
+        )
+
+    def custom_code_path(self, func=None):
+        if func:
+            return os.path.join(DAProject.CUSTOM_CODE_PATH, self.dm_name, func)
+        return os.path.join(DAProject.CUSTOM_CODE_PATH, self.dm_name)
+
+    def read_custom_code(self, func):
+        return open(self.custom_code_path(func)).read()
+
+    def write_custom_code(self, func, code):
+        with open(self.custom_code_path(func), 'w') as f:
+            f.write(code)
+
+    def backup_custom_codes(self):
+        shutil.rmtree(
+            '{}.{}'.format(self.custom_code_path(), DAProject.BACKUP_POSTFIX),
+            ignore_errors=True
+        )
+        shutil.copytree(
+            self.custom_code_path(),
+            '{}.{}'.format(self.custom_code_path(), DAProject.BACKUP_POSTFIX)
+        )
+
+    def cleanup_backuped_custom_codes(self):
+        shutil.rmtree(
+            '{}.{}'.format(self.custom_code_path(), DAProject.BACKUP_POSTFIX),
+            ignore_errors=True
+        )
+
+    def recover_custom_codes(self):
+        shutil.rmtree(self.custom_code_path())
+        shutil.copytree(
+            '{}.{}'.format(self.custom_code_path(), DAProject.BACKUP_POSTFIX),
+            self.custom_code_path()
+        )
+
+    def update_custom_codes(self, custom_codes):
+        self.write_custom_code('deviceInitialize', custom_codes['deviceInitialize'])
+        self.write_custom_code('device2EasyConnect', custom_codes['device2Easyconnect'])
+        self.write_custom_code('easyConnect2Device', custom_codes['easyConnect2Device'])
+        self.write_custom_code('deviceTerminate', custom_codes['deviceTerminate'])
+
+    def initialize_custom_codes(self):
+        if not os.path.isdir(self.custom_code_path()):
+            # editing this device model first time, create empty custom code
+            os.mkdir(self.custom_code_path())
+            self.write_custom_code('deviceInitialize', '')
+            self.write_custom_code('device2EasyConnect', '')
+            self.write_custom_code('easyConnect2Device', '')
+            self.write_custom_code('deviceTerminate', '')
+
+    def inject_custom_code(self, df_list):
+        loader = FileSystemLoader(self.src_code_path)
+        env = Environment(loader=loader)
+
+        # get and render template file
+        template = env.get_template('Custom.java')
+        context = {
+            'code_deviceInitialize':    self.read_custom_code('deviceInitialize'),
+            'code_device2Easyconnect':  self.read_custom_code('device2EasyConnect'),
+            'code_easyConnect2Device':  self.read_custom_code('easyConnect2Device'),
+            'code_deviceTerminate':     self.read_custom_code('deviceTerminate'),
+            'dm_name':                  self.dm_name,
+            'dm_name_l':                self.dm_name.lower(),
+            'df_list':                  '","'.join(df_list),
+        }
+        custom_code = template.render(**context)
+
+        with open(join(self.src_code_path, 'Custom.java'), 'w') as f:
+            f.write(custom_code)
+
+    def render_simple_files(self, filepath, filelist):
+        if isinstance(filelist, str):
+            filelist = [filelist]
+
+        loader = FileSystemLoader(filepath)
+        env = Environment(loader=loader)
+        for filename in filelist:
+            template = env.get_template(filename)
+            result = template.render(
+                dm_name=self.dm_name,
+                dm_name_l=self.dm_name.lower(),
+            )
+            with open(os.path.join(filepath, filename), 'w') as f:
+                f.write(result)
+
+    def inject_package_name(self):
+        #######################
+        # AndroidManifest.xml #
+        #######################
+        self.render_simple_files(os.path.join(self.root_path, self.dm_name), 'AndroidManifest.xml')
+
+        ###########################
+        # res/layout & res/values #
+        ###########################
+        self.render_simple_files(
+            os.path.join(self.root_path, self.dm_name, 'res/layout'),
+            ('activity_main_connected.xml', 'activity_main_searching.xml')
+        )
+
+        self.render_simple_files(
+            os.path.join(self.root_path, self.dm_name, 'res/values'),
+            'strings.xml'
+        )
+
+        ################
+        # source codes #
+        ################
+        self.render_simple_files(
+            self.src_code_path,
+            filter(lambda x: x.endswith('.java'), os.listdir(self.src_code_path))
+        )
+
+        ##########
+        # Others #
+        ##########
+        self.render_simple_files(
+            os.path.join(self.root_path, self.dm_name),
+            '.project'
+        )
+
+        self.render_simple_files(
+            self.root_path,
+            'settings.gradle'
+        )
+
+    def build(self):
+        p = sub.Popen(
+            ['sh', 'workspace/compile.sh', self.dm_name],
+            stdout=sub.PIPE,
+            stderr=sub.PIPE,
+            bufsize=1)
+
+        while p.poll() == None:
+            data = p.stdout.readline()
+            compile_message[self.dm_name].append(str(data, 'utf-8'))
+
+        if p.poll():
+            compile_message[self.dm_name].extend(map(lambda x: str(x, 'utf-8'), p.stderr.readlines()))
+
+        return 'S' if p.poll() == 0 else 'F'
+
+    def update_apk(self):
+        shutil.copyfile(
+            self.build_apk_path,
+            os.path.join(DOWNLOAD_PATH, self.dm_name + '.apk')
+        )
+
+    @property
+    def build_apk_path(self):
+        return os.path.join(
+            self.root_path,
+            self.dm_name,
+            'build/outputs/apk',
+            self.dm_name + '-debug.apk'
+        )
+
+    @property
+    def apk_path(self):
+        return os.path.join(DOWNLOAD_PATH, self.dm_name + '.apk')
 
 app = Flask(__name__)
 lock = threading.Semaphore()
@@ -35,14 +221,6 @@ compile_result = {}     # compile result (status code)
 
 def join(*args, **kwargs):
     return os.path.join(*args, **kwargs)
-
-
-def get_model_custom_code_path(dm_name):
-    return join(CUSTOM_CODE_PATH, dm_name)
-
-
-def _milli_time():
-    return int(round(time.time()*1000))
 
 
 @app.route('/')
@@ -86,10 +264,11 @@ def da_creator(dm_name):
         # creating a compiling session
         lock.acquire()
         custom_codes = {}
-        custom_codes['device-initialize'] = request.form['device-initialize']
-        custom_codes['device2easyconnect'] = request.form['device2easyconnect']
-        custom_codes['easyconnect2device'] = request.form['easyconnect2device']
-        custom_codes['device-terminate'] = request.form['device-terminate']
+        custom_codes['deviceInitialize'] = request.form['deviceInitialize']
+        custom_codes['device2Easyconnect'] = request.form['device2Easyconnect']
+        custom_codes['easyConnect2Device'] = request.form['easyConnect2Device']
+        custom_codes['deviceTerminate'] = request.form['deviceTerminate']
+        custom_codes['df_list'] = request.form.getlist('df_list[]')
         t = threading.Thread(target=worker, args=(dm_name, custom_codes))
         t.daemon = True
         thread_pool[dm_name] = t
@@ -126,25 +305,19 @@ def get_df_list(dm_name):   #{{{
 def da_creator_form(dm_name):
     template = 'da-creator-form.html'
 
-    model_custom_code_path = get_model_custom_code_path(dm_name)
-    if not os.path.isdir(model_custom_code_path):
-        # first editing this device model, create empty custom code
-        os.mkdir(model_custom_code_path)
-        open(join(model_custom_code_path, 'deviceInitialize'), 'w').close()
-        open(join(model_custom_code_path, 'device2EasyConnect'), 'w').close()
-        open(join(model_custom_code_path, 'easyConnect2Device'), 'w').close()
-        open(join(model_custom_code_path, 'deviceTerminate'), 'w').close()
+    da_project = DAProject(dm_name)
+    da_project.initialize_custom_codes()
 
     context = {
         'dm_name': dm_name,
-        'features': get_df_list(dm_name),
+        'df_list': get_df_list(dm_name),
         'dm_name_list': get_dm_name_list(),
-        'da_available': os.path.exists(join(DOWNLOAD_PATH, '{}.apk'.format(dm_name))),
+        'da_available': os.path.exists(da_project.apk_path),
 
-        'code_device_initialize': open(join(model_custom_code_path, 'deviceInitialize')).read(),
-        'code_device2easyconnect': open(join(model_custom_code_path, 'device2EasyConnect')).read(),
-        'code_easyconnect2device': open(join(model_custom_code_path, 'easyConnect2Device')).read(),
-        'code_device_terminate': open(join(model_custom_code_path, 'deviceTerminate')).read(),
+        'code_deviceInitialize':  da_project.read_custom_code('deviceInitialize'),
+        'code_device2Easyconnect': da_project.read_custom_code('device2EasyConnect'),
+        'code_easyConnect2Device': da_project.read_custom_code('easyConnect2Device'),
+        'code_deviceTerminate':   da_project.read_custom_code('deviceTerminate'),
 
         'email': 'pi314.cs03g@nctu.edu.tw',
     }
@@ -159,85 +332,21 @@ def worker(dm_name, custom_codes):
     compile_result[dm_name] = 'C'     # 'C'ompiling  'S'uccess  'F'ailed
 
     print(dm_name, 'worker')
-    update_custom_code(dm_name, custom_codes)
-    setup_project(dm_name)
-    compile_result[dm_name] = 'S' if compile_project(dm_name) == 0 else 'F'
+    da_project = DAProject(dm_name)
+    da_project.backup_custom_codes()
+    da_project.update_custom_codes(custom_codes)
+    da_project.create()
+    da_project.inject_custom_code(custom_codes['df_list'])
+    da_project.inject_package_name()
+    compile_result[dm_name] = da_project.build()
     if compile_result[dm_name] == 'S':
-        clean_backup_files(dm_name)
-        update_apk(dm_name)
+        da_project.cleanup_backuped_custom_codes()
+        da_project.update_apk()
     else:
-        recover_custom_code(dm_name)
+        da_project.recover_custom_codes()
 
-    clean_project(dm_name)
+    da_project.clean()
     print(dm_name, 'end')
-
-
-def update_custom_code(dm_name, custom_codes):
-    model_custom_code_path = get_model_custom_code_path(dm_name)
-    shutil.rmtree('{}.{}'.format(model_custom_code_path, BACKUP_POSTFIX), ignore_errors=True)
-    shutil.copytree(
-        model_custom_code_path,
-        '{}.{}'.format(model_custom_code_path, BACKUP_POSTFIX)
-    )
-
-    with open(join(model_custom_code_path, 'deviceInitialize'), 'w') as f:
-        f.write(custom_codes['device-initialize'])
-
-    with open(join(model_custom_code_path, 'device2EasyConnect'), 'w') as f:
-        f.write(custom_codes['device2easyconnect'])
-
-    with open(join(model_custom_code_path, 'easyConnect2Device'), 'w') as f:
-        f.write(custom_codes['easyconnect2device'])
-
-    with open(join(model_custom_code_path, 'deviceTerminate'), 'w') as f:
-        f.write(custom_codes['device-terminate'])
-
-
-def clean_backup_files(dm_name):
-    shutil.rmtree('{}.{}'.format(get_model_custom_code_path(dm_name), BACKUP_POSTFIX))
-
-
-def recover_custom_code(dm_name):
-    shutil.rmtree(get_model_custom_code_path(dm_name))
-
-
-def setup_project(dm_name):
-    shutil.rmtree(join(WORKSPACE_PATH, dm_name), ignore_errors=True)
-    shutil.copytree(DA_TEMPLATE_PATH, join(WORKSPACE_PATH, dm_name))
-
-    print(join(WORKSPACE_PATH, dm_name, CUSTOM_TEMPLATE_PATH))
-    loader = FileSystemLoader(join(WORKSPACE_PATH, dm_name,CUSTOM_TEMPLATE_PATH))
-    env = Environment(loader=loader)
-
-    # get and render template file
-    template = env.get_template('Custom.java')
-    model_custom_code_path = get_model_custom_code_path(dm_name)
-    context = {
-        'code_deviceInitialize': open(join(model_custom_code_path, 'deviceInitialize')).read(),
-        'code_device2Easyconnect': open(join(model_custom_code_path, 'device2EasyConnect')).read(),
-        'code_easyconnect2Device': open(join(model_custom_code_path, 'easyConnect2Device')).read(),
-        'code_deviceTerminate': open(join(model_custom_code_path, 'deviceTerminate')).read(),
-    }
-
-    with open(join(WORKSPACE_PATH, dm_name, CUSTOM_TEMPLATE_PATH, 'Custom.java'), 'w') as f:
-        f.write(template.render(**context))
-
-
-def compile_project(dm_name):
-    p = sub.Popen(['sh', 'workspace/compile.sh', dm_name], stdout=sub.PIPE, bufsize=1)
-    while p.poll() == None:
-        data = p.stdout.readline()
-        compile_message[dm_name].append(str(data, 'utf-8'))
-
-    return_code = p.poll()
-    return return_code
-
-
-def update_apk(dm_name):
-    shutil.copyfile(
-        join(WORKSPACE_PATH, dm_name, OUTPUT_APK_PATH, '{}{}'.format(dm_name, OUTPUT_APK_POSTFIX)),
-        join(DOWNLOAD_PATH, '{}.apk'.format(dm_name))
-    )
 
 
 def clean_project(dm_name):

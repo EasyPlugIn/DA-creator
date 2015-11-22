@@ -1,7 +1,9 @@
 {% extends "easyconnect-template.html" %}
 {% block content %}
-  {% if compile_result in ("S", "F") %}
-  <h1>Compile Result</h1>
+  {% if compile_result == "S" %}
+  <h1>Compile Result - Successed</h1>
+  {% elif compile_result == "F" %}
+  <h1>Compile Result - Failed</h1>
   {% else %}
   <h1>Compiling...</h1>
   {% endif %}
@@ -14,12 +16,12 @@
   <div class="compile-message compile-error">{{ i }}</div>
   {% endfor %}
 
-  {# {% if not end %} #}
-  {# <script> #}
-  {#     setTimeout(function () {window.scrollTo(0, document.body.scrollHeight)}, 1); #}
-  {# </script> #}
-  {# <script> #}
-  {#     setTimeout(function () {window.location = window.location;}, 500); #}
-  {# </script> #}
-  {# {% endif %} #}
+  {% if compile_result != "F" %}
+  <script>
+      setTimeout(function () {window.scrollTo(0, document.body.scrollHeight)}, 1);
+  </script>
+  <script>
+      setTimeout(function () {window.location = window.location;}, 3000);
+  </script>
+  {% endif %}
 {% endblock %}

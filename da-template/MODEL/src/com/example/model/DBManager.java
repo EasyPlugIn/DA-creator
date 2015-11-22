@@ -1,4 +1,4 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,10 +18,10 @@ public class DBManager {
     static private final String db_dir  = sd_card + "/EasyConnect/";
     static private String db_name = "history.json";
     static private String db_path = db_dir + db_name;
-    
+
     static public void set_db_name (String name) {
-    	db_name = name +".json";
-    	db_path = db_dir + db_name;
+        db_name = name +".json";
+        db_path = db_dir + db_name;
     }
 
     /**
@@ -30,17 +30,17 @@ public class DBManager {
      * */
     static public JSONObject dump_db ()
             throws IOException, JSONException {
-        
+
         if ( !db_exists() ) {
             create_empty_db();
         }
-        
+
         if ( !db_readable() ) {
             return null;
         }
-        
+
         File db_file = new File(db_path);
-        
+
         BufferedReader br = null;
         try {
             br = new BufferedReader( new FileReader(db_file) );
@@ -50,9 +50,9 @@ public class DBManager {
                 // operation on data_line
                 db_raw_data += tmp;
             }
-            
+
             return new JSONObject(db_raw_data);
-            
+
         } finally {
             try {
                 if (br != null) br.close();
@@ -60,32 +60,32 @@ public class DBManager {
                 throw e;
             }
         }
-        
+
     }
-    
-    static public void write_db (JSONObject database) 
+
+    static public void write_db (JSONObject database)
             throws IOException {
         if ( !db_readable() ) {
             return;
         }
-        
+
         if ( !db_exists() ) {
             return;
         }
-        
+
         File db_file = new File(db_path);
         FileWriter fw = new FileWriter(db_file);
         fw.write(database.toString());
         fw.close();
     }
-    
+
     static public boolean db_exists () {
         if ( !isExternalStorageReadable() )
             return false;
-        
+
         return ( new File(db_path) ).exists();
     }
-    
+
     static public boolean db_readable () {
         if ( !db_exists() )
             return false;
@@ -103,42 +103,42 @@ public class DBManager {
         } catch (Exception e) {
             return false;
         }
-        
+
     }
-    
+
     static public boolean db_writable () {
         if ( !db_exists() )
             return false;
-        
+
         File f = new File(db_path);
 
         if ( !f.canWrite() )
             return false;
-        
+
         return true;
     }
-    
+
     static public void create_empty_db ()
         throws IOException {
-        
+
         String content = "{}";
-        
+
         File db = new File(db_path);
         FileWriter fw = new FileWriter(db.getAbsoluteFile());
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(content);
         bw.close();
-        
+
     }
-    
+
     static public boolean db_ok () {
 
         if ( !isExternalStorageReadable() )
             return false;
-        
+
         if ( !isExternalStorageWritable() )
             return false;
-        
+
         File f = new File(db_path + db_name);
         if ( f.exists() ) {
             return true;
@@ -152,7 +152,7 @@ public class DBManager {
             return false;
         }
     }
-    
+
     /* Checks if external storage is available for read and write */
     static public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
