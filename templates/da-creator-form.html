@@ -4,11 +4,18 @@
   <span>Device Model: </span>
     <span>{{ dm_name }}</span>
     <input type="hidden" name="device-model-name" value="{{ dm_name }}"><br>
-  <span>Feature List: </span>
+  <span>Input Feature List: </span>
   <ul>
-  {% for f in df_list %}
+  {% for f in idf_list %}
     <li>{{ f }}</li>
-    <input type="hidden" name="df_list[]" value="{{ f }}">
+    <input type="hidden" name="idf_list[]" value="{{ f }}">
+  {% endfor %}
+  </ul>
+  <span>Output Feature List: </span>
+  <ul>
+  {% for f in odf_list %}
+    <li>{{ f }}</li>
+    <input type="hidden" name="odf_list[]" value="{{ f }}">
   {% endfor %}
   </ul>
 

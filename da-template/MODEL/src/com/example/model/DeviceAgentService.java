@@ -75,7 +75,9 @@ public class DeviceAgentService extends Service {
                 public void handleMessage (Message msg) {
                     switch ((EasyConnect.Tag)msg.getData().getSerializable("tag")) {
                     case ATTACH_SUCCESS:
-                        EasyConnect.subscribe(Custom.df_list[0], easyconnect_data_handler);
+                        for (String f: Custom.odf_list) {
+                            EasyConnect.subscribe(f, easyconnect_data_handler);
+                        }
                         UpStreamThread.start_working();
                         break;
                     }
@@ -161,7 +163,10 @@ public class DeviceAgentService extends Service {
             profile.put("d_name", device_name);
             profile.put("dm_name", Custom.DEVICE_MODEL);
             JSONArray feature_list = new JSONArray();
-            for (String f: Custom.df_list) {
+            for (String f: Custom.idf_list) {
+                feature_list.put(f);
+            }
+            for (String f: Custom.odf_list) {
                 feature_list.put(f);
             }
             profile.put("df_list", feature_list);

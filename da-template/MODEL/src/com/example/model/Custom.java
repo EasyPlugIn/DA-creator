@@ -10,7 +10,17 @@ import android.util.Log;
 public class Custom {
 
     static final public String DEVICE_MODEL = "{{ dm_name }}";
-    static final public String[] df_list = new String[]{"{{ df_list }}"};
+    static final public String[] idf_list = new String[]{
+    {% for f in idf_list %}
+        "{{ f }}",
+    {% endfor %}
+    };
+
+    static final public String[] odf_list = new String[]{
+    {% for f in odf_list %}
+        "{{ f }}",
+    {% endfor %}
+    };
 
     static public void deviceInitialize () {
 {{ code_deviceInitialize }}

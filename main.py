@@ -102,7 +102,7 @@ class DAProject:
             self.write_custom_code('easyConnect2Device', '')
             self.write_custom_code('deviceTerminate', '')
 
-    def inject_custom_code(self, df_list):
+    def inject_custom_code(self, idf_list, odf_list):
         loader = FileSystemLoader(self.src_code_path)
         env = Environment(loader=loader)
 
@@ -115,7 +115,8 @@ class DAProject:
             'code_deviceTerminate':     self.read_custom_code('deviceTerminate'),
             'dm_name':                  self.dm_name,
             'dm_name_l':                self.dm_name.lower(),
-            'df_list':                  '","'.join(df_list),
+            'idf_list':                 idf_list,
+            'odf_list':                 odf_list,
         }
         custom_code = template.render(**context)
 
@@ -268,7 +269,8 @@ def da_creator(dm_name):
         custom_codes['device2Easyconnect'] = request.form['device2Easyconnect']
         custom_codes['easyConnect2Device'] = request.form['easyConnect2Device']
         custom_codes['deviceTerminate'] = request.form['deviceTerminate']
-        custom_codes['df_list'] = request.form.getlist('df_list[]')
+        custom_codes['idf_list'] = request.form.getlist('idf_list[]')
+        custom_codes['odf_list'] = request.form.getlist('odf_list[]')
         t = threading.Thread(target=worker, args=(dm_name, custom_codes))
         t.daemon = True
         thread_pool[dm_name] = t
@@ -298,7 +300,7 @@ def get_df_list(dm_name):   #{{{
                 bytes('model_name={}'.format(dm_name), 'utf8')
             ).readall(), 'utf8'
         ))
-    return [i[0] for i in raw_data['idf'] + raw_data['odf']]
+    return {'idf': map(lambda x: x[0], raw_data['idf']), 'odf': map(lambda x: x[0], raw_data['odf'])}
 #}}}
 
 
@@ -307,17 +309,19 @@ def da_creator_form(dm_name):
 
     da_project = DAProject(dm_name)
     da_project.initialize_custom_codes()
+    df_list = get_df_list(dm_name)
 
     context = {
         'dm_name': dm_name,
-        'df_list': get_df_list(dm_name),
+        'idf_list': df_list['idf'],
+        'odf_list': df_list['odf'],
         'dm_name_list': get_dm_name_list(),
         'da_available': os.path.exists(da_project.apk_path),
 
-        'code_deviceInitialize':  da_project.read_custom_code('deviceInitialize'),
+        'code_deviceInitialize':   da_project.read_custom_code('deviceInitialize'),
         'code_device2Easyconnect': da_project.read_custom_code('device2EasyConnect'),
         'code_easyConnect2Device': da_project.read_custom_code('easyConnect2Device'),
-        'code_deviceTerminate':   da_project.read_custom_code('deviceTerminate'),
+        'code_deviceTerminate':    da_project.read_custom_code('deviceTerminate'),
 
         'email': 'pi314.cs03g@nctu.edu.tw',
     }
@@ -336,7 +340,7 @@ def worker(dm_name, custom_codes):
     da_project.backup_custom_codes()
     da_project.update_custom_codes(custom_codes)
     da_project.create()
-    da_project.inject_custom_code(custom_codes['df_list'])
+    da_project.inject_custom_code(custom_codes['idf_list'], custom_codes['odf_list'])
     da_project.inject_package_name()
     compile_result[dm_name] = da_project.build()
     if compile_result[dm_name] == 'S':
