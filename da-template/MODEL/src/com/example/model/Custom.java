@@ -22,20 +22,12 @@ public class Custom {
     {% endfor %}
     };
 
-    static public void deviceInitialize () {
-{{ code_deviceInitialize }}
-    }
-
     static public void device2EasyConnect (ByteQueue bq) {
 {{ code_device2EasyConnect }}
     }
 
     static public void easyConnect2Device (String feature, JSONArray data) {
 {{ code_easyConnect2Device }}
-    }
-
-    static public void deviceTerminate () {
-{{ code_deviceTerminate }}
     }
 
     /******************************************************************************/

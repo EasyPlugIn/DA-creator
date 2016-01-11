@@ -27,21 +27,7 @@
   <hr>
   {% endif %}
 
-  <h1>Initialzation</h1>
-  <div>
-    <div class="editor">
-      <span class="code">static public void deviceInitialize () {</span><br>
-      <textarea id="deviceInitialize" class="code code-area" name="deviceInitialize">{{ code_deviceInitialize }}</textarea><br>
-      <span class="code">}</span><br>
-    </div>
-    <div class="toolkit">
-      <button type="button" onclick="insertTextAtCaret('deviceInitialize', 'send_data();');">send_data();</button>
-      <button type="button" onclick="insertTextAtCaret('deviceInitialize', 'try {\n} catch () {\n}')">try-catch</button>
-    </div>
-    <div class="clear"></div>
-  </div>
-
-  <h1>JSON Encoder (Up-stream)</h1>
+  <h1>IDF Decoder (Up-stream)</h1>
   <div>
     <div class="editor">
       <span class="code">static public void device2EasyConnect (ByteQueue bq) {</span><br>
@@ -57,7 +43,7 @@
     <div class="clear"></div>
   </div>
 
-  <h1>JSON Decoder (Down-stream)</h1>
+  <h1>ODF Decoder (Down-stream)</h1>
   <div>
     <div class="editor">
       <span class="code">static public void easyConnect2Device (String feature, JSONArray data) {</span><br>
@@ -65,20 +51,6 @@
       <span class="code">}</span><br>
     </div>
     <div class="toolkit">
-    </div>
-    <div class="clear"></div>
-  </div>
-
-  <h1>Termination</h1>
-  <div>
-    <div class="editor">
-      <span class="code">static public void deviceTerminate () {</span><br>
-      <textarea id="deviceTerminate" class="code code-area" name="deviceTerminate">{{ code_deviceTerminate }}</textarea><br>
-      <span class="code">}</span><br>
-    </div>
-    <div class="toolkit">
-      <button type="button" onclick="insertTextAtCaret('deviceTerminate', 'send_data();');">send_data();</button>
-      <button type="button" onclick="insertTextAtCaret('deviceTerminate', 'try {\n} catch () {\n}')">try-catch</button>
     </div>
     <div class="clear"></div>
   </div>

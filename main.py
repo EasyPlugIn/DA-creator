@@ -88,19 +88,15 @@ class DAProject:
         )
 
     def update_custom_codes(self, custom_codes):
-        self.write_custom_code('deviceInitialize', custom_codes['deviceInitialize'])
         self.write_custom_code('device2EasyConnect', custom_codes['device2Easyconnect'])
         self.write_custom_code('easyConnect2Device', custom_codes['easyConnect2Device'])
-        self.write_custom_code('deviceTerminate', custom_codes['deviceTerminate'])
 
     def initialize_custom_codes(self):
         if not os.path.isdir(self.custom_code_path()):
             # editing this device model first time, create empty custom code
             os.mkdir(self.custom_code_path())
-            self.write_custom_code('deviceInitialize', '')
             self.write_custom_code('device2EasyConnect', '')
             self.write_custom_code('easyConnect2Device', '')
-            self.write_custom_code('deviceTerminate', '')
 
     def inject_custom_code(self, idf_list, odf_list):
         loader = FileSystemLoader(self.src_code_path)
@@ -109,10 +105,8 @@ class DAProject:
         # get and render template file
         template = env.get_template('Custom.java')
         context = {
-            'code_deviceInitialize':    self.read_custom_code('deviceInitialize'),
             'code_device2Easyconnect':  self.read_custom_code('device2EasyConnect'),
             'code_easyConnect2Device':  self.read_custom_code('easyConnect2Device'),
-            'code_deviceTerminate':     self.read_custom_code('deviceTerminate'),
             'dm_name':                  self.dm_name,
             'dm_name_l':                self.dm_name.lower(),
             'idf_list':                 idf_list,
@@ -265,10 +259,8 @@ def da_creator(dm_name):
         # creating a compiling session
         lock.acquire()
         custom_codes = {}
-        custom_codes['deviceInitialize'] = request.form['deviceInitialize']
         custom_codes['device2Easyconnect'] = request.form['device2Easyconnect']
         custom_codes['easyConnect2Device'] = request.form['easyConnect2Device']
-        custom_codes['deviceTerminate'] = request.form['deviceTerminate']
         custom_codes['idf_list'] = request.form.getlist('idf_list[]')
         custom_codes['odf_list'] = request.form.getlist('odf_list[]')
         t = threading.Thread(target=worker, args=(dm_name, custom_codes))
@@ -318,10 +310,8 @@ def da_creator_form(dm_name):
         'dm_name_list': get_dm_name_list(),
         'da_available': os.path.exists(da_project.apk_path),
 
-        'code_deviceInitialize':   da_project.read_custom_code('deviceInitialize'),
         'code_device2Easyconnect': da_project.read_custom_code('device2EasyConnect'),
         'code_easyConnect2Device': da_project.read_custom_code('easyConnect2Device'),
-        'code_deviceTerminate':    da_project.read_custom_code('deviceTerminate'),
 
         'email': 'pi314.cs03g@nctu.edu.tw',
     }
