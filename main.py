@@ -236,14 +236,10 @@ def da_creator(dm_name):
         # no compiling session exists
         return da_creator_form(dm_name)
 
-    elif request.method == 'POST' and compiling_session_exists:
-        # recreate compiling session, not allowed
-        return da_creator_form(dm_name)
-
     context = {'dm_name_list': get_dm_name_list()}
     template = 'compile-message.html'
 
-    if request.method == 'GET' and compiling_session_exists:
+    if compiling_session_exists:
         # there is an existing compiling session
         context['compile_message'] = compile_message[dm_name]
         context['compile_result'] = compile_result[dm_name]
