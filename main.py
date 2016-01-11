@@ -293,7 +293,10 @@ def get_df_list(dm_name):   #{{{
 
 
 def da_creator_form(dm_name):
-    template = 'da-creator-form.html'
+    if dm_name.lower() == 'morsensor':
+        template = 'da-creator-morsensor.html'
+    else:
+        template = 'da-creator-bluetooth.html'
 
     da_project = DAProject(dm_name)
     da_project.initialize_custom_codes()
