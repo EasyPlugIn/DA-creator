@@ -1,0 +1,3 @@
+include ':{{ dm_name }}'
+include ':appcompat_v7'
+

@@ -1,3 +1,0 @@
-include ':MorSensor'
-include ':appcompat_v7'
-

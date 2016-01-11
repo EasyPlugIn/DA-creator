@@ -1,0 +1,11 @@
+try {
+    int vibration = data.getInt(0);
+    byte[] chars;
+    if (vibration > 0) {
+        chars = new byte[ vibration ];
+        Arrays.fill(chars, (byte)48);
+        send_data(chars);
+    }
+} catch (JSONException e) {
+    e.printStackTrace();
+}

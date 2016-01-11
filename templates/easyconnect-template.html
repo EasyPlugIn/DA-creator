@@ -18,10 +18,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='add_function.css')}}">
     <script src="{{ url_for('static', filename='select_device_model.js') }}"></script>
 
-    <link href="{{ url_for('static', filename='da-creater.css') }}" rel="stylesheet" type="text/css" media="all">
+    <link href="{{ url_for('static', filename='da-creator.css') }}" rel="stylesheet" type="text/css" media="all">
     <link href="{{ url_for('static', filename='compile.css') }}" rel="stylesheet" type="text/css" media="all">
     <script src="{{ url_for('static', filename='jquery-1.11.2.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='da-creater.js')}}"></script>
+    <script src="{{ url_for('static', filename='da-creator.js')}}"></script>
 
   </head>
   <body>
@@ -54,8 +54,8 @@
 
                   <li><a href="#"><i class="icon-file"></i>DA Creation</a>
                     <ul>
-                      {% for dm in device_model_name_list %}
-                        <li class="model-list"><a href="/da-creater/{{dm}}">{{ dm }}</a></li>
+                      {% for dm in dm_name_list %}
+                        <li class="model-list"><a href="/da-creator/{{dm}}">{{ dm }}</a></li>
                       {% endfor %}
                     </ul>
                   </li>
@@ -71,7 +71,7 @@
 
       <div id="content">
         {% block content %}{% endblock %}
-        {# <iframe id="da-creater" src="/da-creater/Dandelion"/> #}
+        {# <iframe id="da-creator" src="/da-creator/Dandelion"/> #}
       </div>
 
     </div>
