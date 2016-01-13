@@ -1,4 +1,6 @@
-package com.example.{{ dm_name_l }};
+package com.example.bulb;
+
+import com.example.bulb.DAN.ODFObject;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
@@ -60,7 +62,7 @@ public class DeviceActivity extends Activity {
         setContentView(R.layout.activity_main_connected);
 
         // start EasyConnect Service
-        EasyConnect.start(this, Custom.DEVICE_MODEL);
+        DAN.init(this, Custom.DEVICE_MODEL);
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
@@ -111,31 +113,31 @@ public class DeviceActivity extends Activity {
             }
         });
 
-        Handler easyconnect_status_handler = new Handler () {
-            public void handleMessage (Message msg) {
+        TextView tv_ec_host_status = (TextView)findViewById(R.id.tv_ec_host_status);
+        tv_ec_host_status.setText("...");
+        tv_ec_host_status.setTextColor(Color.rgb(128, 0, 0));
+
+        DAN.Subscriber easyconnect_status_handler = new DAN.Subscriber() {
+            @Override
+            public void odf_handler(ODFObject odf_object) {
                 TextView tv_ec_host_address = (TextView)findViewById(R.id.tv_ec_host_address);
                 TextView tv_ec_host_status = (TextView)findViewById(R.id.tv_ec_host_status);
 
-                tv_ec_host_address.setText(msg.getData().getString("message"));
-                switch ((EasyConnect.Tag)msg.getData().getSerializable("tag")) {
-                case ATTACH_TRYING:
-                    tv_ec_host_status.setText("...");
-                    tv_ec_host_status.setTextColor(Color.rgb(128, 0, 0));
-                    break;
-
-                case ATTACH_FAILED:
+                tv_ec_host_address.setText(odf_object.message);
+                switch (odf_object.event_tag) {
+                case REGISTER_FAILED:
                     tv_ec_host_status.setText("!");
                     tv_ec_host_status.setTextColor(Color.rgb(128, 0, 0));
                     break;
 
-                case ATTACH_SUCCESS:
+                case REGISTER_SUCCEED:
                     tv_ec_host_status.setText("~");
                     tv_ec_host_status.setTextColor(Color.rgb(0, 128, 0));
                     break;
                 }
             }
         };
-        EasyConnect.register(easyconnect_status_handler);
+        DAN.subscribe("Control_channel", easyconnect_status_handler);
 
         Intent i = new Intent(this, DeviceAgentService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);

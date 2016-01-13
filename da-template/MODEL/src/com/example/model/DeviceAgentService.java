@@ -1,4 +1,4 @@
-package com.example.{{ dm_name_l }};
+package com.example.bulb;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +10,8 @@ import java.util.concurrent.Semaphore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.example.bulb.DAN.ODFObject;
 
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
@@ -36,8 +38,8 @@ public class DeviceAgentService extends Service {
     static Semaphore state_lock;
     static private States state;
 
-    Handler easyconnect_status_handler;
-    Handler easyconnect_data_handler;
+    DAN.Subscriber easyconnect_status_handler;
+    DAN.Subscriber easyconnect_data_handler;
 
     static private String device_name;
     static private String device_addr;
@@ -71,25 +73,35 @@ public class DeviceAgentService extends Service {
             device_addr = b.getString("device_addr");
             state_lock = new Semaphore(1);
 
-            easyconnect_status_handler = new Handler () {
-                public void handleMessage (Message msg) {
-                    switch ((EasyConnect.Tag)msg.getData().getSerializable("tag")) {
-                    case ATTACH_SUCCESS:
+            easyconnect_status_handler = new DAN.Subscriber () {
+                @Override
+                public void odf_handler(ODFObject odf_object) {
+                    switch (odf_object.event_tag) {
+                    case REGISTER_SUCCEED:
                         for (String f: Custom.odf_list) {
-                            EasyConnect.subscribe(f, easyconnect_data_handler);
+                            DAN.subscribe(f, easyconnect_data_handler);
                         }
                         UpStreamThread.start_working();
+                        break;
+                    case REGISTER_FAILED:
+                        break;
+                    default:
                         break;
                     }
                 }
             };
-            EasyConnect.register(easyconnect_status_handler);
+            DAN.subscribe("Control_channel", easyconnect_status_handler);
 
-            easyconnect_data_handler = new Handler () {
-                public void handleMessage (Message msg) {
-                    String feature = msg.getData().getString("feature");
-                    EasyConnect.DataSet dataset = msg.getData().getParcelable("dataset");
-                    Custom.easyConnect2Device(feature, (JSONArray)(dataset.newest().data));
+            easyconnect_data_handler = new DAN.Subscriber () {
+                @Override
+                public void odf_handler(ODFObject odf_object) {
+                    String feature = odf_object.feature;
+                    DAN.DataSet dataset = odf_object.dataset;
+                    try {
+                        Custom.easyConnect2Device(feature, (JSONArray)(dataset.newest().data));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             };
 
@@ -171,8 +183,8 @@ public class DeviceAgentService extends Service {
             }
             profile.put("df_list", feature_list);
             profile.put("u_name", "yb");
-            profile.put("monitor", EasyConnect.get_mac_addr());
-            EasyConnect.attach(EasyConnect.get_d_id(device_addr.replace(":", "")), profile);
+            profile.put("monitor", DAN.get_mac_addr());
+            DAN.register(DAN.get_d_id(device_addr.replace(":", "")), profile);
         } catch (JSONException e) {
             logging("JSONException when attaching");
             e.printStackTrace();
@@ -218,7 +230,7 @@ public class DeviceAgentService extends Service {
 
     static public void stop_working () {
         disconnect();
-        EasyConnect.detach();
+        DAN.deregister();
         self.stopSelf();
     }
 
