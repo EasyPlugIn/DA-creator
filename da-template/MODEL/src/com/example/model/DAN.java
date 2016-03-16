@@ -1,4 +1,4 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
 import java.io.IOException;
 import java.net.DatagramPacket;

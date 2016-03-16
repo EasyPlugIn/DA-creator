@@ -1,6 +1,6 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
-import com.example.bulb.DAN.ODFObject;
+import com.example.{{ dm_name_l }}.DAN.ODFObject;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;

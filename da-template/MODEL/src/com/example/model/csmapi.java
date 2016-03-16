@@ -1,4 +1,4 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ import android.util.Log;
 public class csmapi {
 	static public String log_tag = "csmapi";
 	static public String ENDPOINT = "http://openmtc.darkgerm.com:9999";
-	
+
 	static public boolean create (String d_id, JSONObject profile) {
 		try {
 	        String url = ENDPOINT +"/"+ d_id;
@@ -57,7 +57,7 @@ public class csmapi {
 		}
 		return false;
     }
-    
+
     static public boolean push (String d_id, String df_name, JSONObject data) {
     	try {
 			//logging(d_id +" pushing to "+ ENDPOINT);
@@ -74,7 +74,7 @@ public class csmapi {
 		}
     	return false;
     }
-    
+
     static public JSONArray pull (String d_id, String df_name) throws JSONException {
 	    try {
 			//logging(d_id +" pulling from "+ ENDPOINT);
@@ -87,13 +87,13 @@ public class csmapi {
 			}
 			JSONObject tmp = new JSONObject(res.body);
 	        return tmp.getJSONArray("samples");
-	        
+
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	static private class http {
     	static public class response {
         	public String body;
@@ -103,50 +103,50 @@ public class csmapi {
                 this.status_code = status_code;
             }
         }
-    	
+
     	static public response get (String url_str) {
     		return request("GET", url_str, null);
         }
-    	
+
     	static public response post (String url_str, JSONObject post_body) {
     		return request("POST", url_str, post_body.toString());
     	}
-    	
+
     	static public response delete (String url_str) {
     		return request("DELETE", url_str, null);
     	}
-    	
+
     	static public response put (String url_str, JSONObject put_body) {
     		return put(url_str, put_body.toString());
     	}
-    	
+
     	static public response put (String url_str, String post_body) {
     		return request("PUT", url_str, post_body);
     	}
-    	
+
     	static private response request (String method, String url_str, String request_body) {
     		try {
     			URL url = new URL(url_str);
     			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
     			connection.setRequestMethod(method);
-    			
+
     			if (method.equals("POST") || method.equals("PUT")) {
 	    			connection.setDoOutput(true);	// needed, even if method had been set to POST
 	    			connection.setRequestProperty("Content-Type", "application/json");
-	    			
+
 	    			OutputStream os = connection.getOutputStream();
 				    os.write(request_body.getBytes());
     			}
-    			
+
                 int status_code = connection.getResponseCode();
             	InputStream in;
-                
+
                 if(status_code >= HttpURLConnection.HTTP_BAD_REQUEST) {
                     in = new BufferedInputStream(connection.getErrorStream());
                 } else {
                     in = new BufferedInputStream(connection.getInputStream());
                 }
-                
+
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 String body = "";
                 String line = "";
@@ -166,12 +166,12 @@ public class csmapi {
             	return new response("IOException", 400);
     		}
     	}
-    	
+
         static private void logging (String message) {
             Log.i(log_tag, "[csmapi.http] " + message);
         }
     }
-	
+
 	static private void logging (String message) {
         Log.i(log_tag, "[csmapi] " + message);
     }

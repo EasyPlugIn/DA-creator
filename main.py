@@ -342,10 +342,6 @@ def worker(dm_name, custom_codes):
     print(dm_name, 'end')
 
 
-def clean_project(dm_name):
-    shutil.rmtree('workspace/{}'.format(dm_name))
-
-
 @app.route('/monitor')
 def monitor():
     template = 'monitor.html'

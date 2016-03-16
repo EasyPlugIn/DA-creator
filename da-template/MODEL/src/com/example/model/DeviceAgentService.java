@@ -1,4 +1,4 @@
-package com.example.bulb;
+package com.example.{{ dm_name_l }};
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.bulb.DAN.ODFObject;
+import com.example.{{ dm_name_l }}.DAN.ODFObject;
 
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;

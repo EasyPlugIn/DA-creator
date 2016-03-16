@@ -1,0 +1,12 @@
+try {
+    int squeeze = data.getInt(0);
+    byte[] chars = new byte[1];
+    if (squeeze == 0) {
+        chars[0] = (byte)48;
+    } else {
+        chars[0] = (byte)49;
+    }
+    send_data(chars);
+} catch (JSONException e) {
+    e.printStackTrace();
+}
