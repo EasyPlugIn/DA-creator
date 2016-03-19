@@ -1,8 +1,8 @@
 try {
-    int vibration = data.getInt(0);
-    byte[] chars;
+    int vibration = (int)(data.getDouble(0));
+    vibration = (vibration > 2) ? 2 : vibration;
     if (vibration > 0) {
-        chars = new byte[ vibration ];
+        byte[] chars = new byte[ vibration ];
         Arrays.fill(chars, (byte)48);
         send_data(chars);
     }
